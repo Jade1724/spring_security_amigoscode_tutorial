@@ -5,7 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
 
     String authorizationHeader = request.getHeader(jwtConfig.getAuthorizationHeader());
 
-    if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
+    if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())) {
       filterChain.doFilter(request, response);
       return;
     }
@@ -48,8 +47,6 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
     String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
 
     try {
-
-      String secretKey = "securesecuresecuresecuresecuresecuresecuresecuresecure";
 
       Jws<Claims> claimsJws = Jwts.parser()
           .setSigningKey(secretKey)
